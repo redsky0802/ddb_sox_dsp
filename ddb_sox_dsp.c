@@ -136,9 +136,13 @@ static int ddb_soxr_process(ddb_dsp_context_t *ctx, float *samples, int frames, 
 
     if (!soxr->soxr) return frames;
 
-    /* 3. 修改时钟标签 (屏蔽 ratio 修改，避免与 DeaDBeeF 宿主自带 SRC 的错误 ratio 叠加) */
+    /* 3. 修改时钟标签 (物理防快放) */
     if (fmt->samplerate != target_rate) {
-        /* 负负得正：宿主即使在直通时也会给出错误 ratio，注释掉此行真实 ratio 以直接抵消宿主 Bug */
+        /* * 进度条修正策略：负负得正
+         * DeaDBeeF 宿主在开启重采样时，即使处于直通状态也会强行计算一个 ratio。
+         * 如果插件在此处给出物理正确的 ratio，会导致与宿主的 ratio 叠加产生 1/4 进度错误。
+         * 解决方法：注释掉插件层的 ratio 修改，让宿主接管进度条比例计算。
+         */
         // if (ratio) *ratio *= (float)target_rate / in_rate;
         fmt->samplerate = target_rate;
     }

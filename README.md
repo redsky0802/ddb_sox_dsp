@@ -1,41 +1,20 @@
 # DeaDBeeF SoX Resampler (FB2K Core)
 
-本项目为 Linux DeaDBeeF 播放器提供高精度的重采样功能，其核心算法与数学模型深度复刻自 Windows 平台著名的 **Foobar2000 SoX Resampler**。
+[English](#english) | [中文](#chinese)
 
-### 1. 开发愿景
-本项目致力于在 Linux 环境下全量复刻 Foobar2000 SoX 插件的声学素质。通过移植其标志性的 Kaiser 窗 FIR 滤波模型，为 PCHiFi 玩家提供精确到 0.1% 的时域控制权，实现无妥协的音频重采样体验。
+<a name="english"></a>
+## English
 
-### 2. 核心逻辑复刻
-受限于 DeaDBeeF 的底层架构与 GUI 机制，本插件聚焦于声学核心逻辑的完美移植，并重构了最关键的数据流屏障：
+High-precision resampling DSP plugin for DeaDBeeF player on Linux. The core algorithms and mathematical models are provided by **libsoxr**, ensuring the same audio quality and filtering characteristics as the famous **Foobar2000 SoX Resampler**.
 
-* **TO_3dB 祖传算法**：完整内置了用于通带补偿的多项式数学模型，将用户设定的 -3dB 截止点精准换算为底层引擎所需的 0dB 起点。
-* **纯手工引擎注入**：拒绝使用 `libsoxr` 的黑盒预设宏（如 VHQ），采用纯手工参数注入，确保滤波器的数学特性完全符合用户预期。
-* **双基准频率路由**：提供 44.1kHz 与 48kHz 两组独立的倍频切换方案（支持 1x/2x/4x），有效避免非整数倍 SRC 带来的相位劣化。
-* **基于 FIFO 的平滑吞吐**：引入了坚固的 FIFO 环形缓冲机制，完美承载异步重采样产生的不规则数据块，提供极致平滑的播放体验，同时在物理层面上杜绝了时钟握手失败导致的“快放”异常。
+### Core Logic
+* **Engine Parity**: Powered by `libsoxr`. Mathematically identical to the Foobar2000 plugin, providing professional-grade 1D resampling.
+* **Manual Parameter Injection**: Bypasses opaque presets. Manually injects physical parameters (Passband, Phase Response, Precision) for predictable filtering.
+* **Dual-Base Routing**: Independent target rates for 44.1kHz and 48kHz families (1x/2x/4x) to ensure integer-ratio resampling.
+* **FIFO Smoothing**: A robust ring buffer handles asynchronous data chunks, ensuring jitter-free playback and preventing "chipmunk" speed anomalies.
 
-### 3. 编译与安装
-
-**环境依赖：**
-
-根据你的 Linux 发行版，安装相应的运行时（Runtime）与编译时（Build）依赖：
-
-* **Debian / Ubuntu 系**
-  * 运行时依赖：`libsoxr0`
-  * 编译依赖：`build-essential cmake libsoxr-dev deadbeef-plugins-dev`
-  ```bash
-  sudo apt install libsoxr0 build-essential cmake libsoxr-dev deadbeef-plugins-dev
-  ```
-
-* **Arch Linux 系**
-  * 运行时依赖：`soxr`
-  * 编译依赖：`base-devel cmake deadbeef`
-  ```bash
-  sudo pacman -S soxr base-devel cmake deadbeef
-  ```
-
-**标准编译与安装步骤：**
-
-本项目采用标准的 CMake 构建系统，默认安装路径已自动配置为用户的本地插件目录（`~/.local/lib/deadbeef/`）。在项目根目录下执行以下命令即可：
+### Compilation & Installation
+**Dependencies**: `libsoxr-dev`, `deadbeef-plugins-dev`, `cmake`.
 
 ```bash
 mkdir build && cd build
@@ -43,25 +22,59 @@ cmake ..
 make
 make install
 ```
-*(注：如果需要系统级全局安装供所有用户使用，可在 cmake 时显式指定：`cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/lib/deadbeef/` 并使用 `sudo make install`)*
 
-安装完成后，完全重启 DeaDBeeF。在 `Preferences -> DSP` 菜单中添加并配置 **SoX Resampler (FB2K Core)** 即可生效。
+*Default install path: `~/.local/lib/deadbeef/`.*
 
-### 4. 宿主配置必读（避免进度条异常）
+### Critical Configuration (Progress Bar Fix)
 
-由于 DeaDBeeF 存在双层重采样机制（宿主自带 SRC + DSP 插件）的时钟比例干扰，为了获得正常的进度条速度与完美的音质，请务必进行以下设置：
-1. 进入 DeaDBeeF `首选项 (Preferences) -> 播放 (Playback)`。
-2. **开启** `重采样 (Resampling)` 选项。
-3. **确保宿主设定的“目标采样率”（Target Sample Rate）与你在 SoX 插件中选择的目标频率完全一致**。
+Due to the double-resampling architecture of DeaDBeeF, please follow these steps to ensure the progress bar moves at the correct speed:
 
-### 5. 参考项目与致谢
+1.  Go to `Preferences -> Playback`.
+2.  **Enable** `Resampling`.
+3.  **Enable** `Resample separate` (to distinguish 44.1k/48k bases).
+4.  **Match the Rates**: Ensure the Host's "Target rate" for both groups **exactly matches** the target frequencies selected in the SoX plugin.
 
-本插件的诞生站在了巨人的肩膀上。核心逻辑与工程架构深度参考了以下开源项目，在此致敬：
+### Credits
 
-* **Foobar2000 foo_dsp_resampler** (by *lvqcl*) 
-  * 提供了核心的时域换算数学模型（`TO_3dB` 通带补偿算法）及高精度浮点参数处理思路。
-* **The SoX Resampler library (libsoxr)** (by *Rob Sykes*)
-  * 提供了底层无可挑剔的高精度一维离散信号重采样运算引擎。
-* **社区版 DeaDBeeF SoXR 插件**
-  * 提供了基础的 DeaDBeeF DSP API 握手规范及内存布局映射参考。
+  * **lvqcl**: For the original Foobar2000 plugin logic and `TO_3dB` model.
+  * **Rob Sykes**: For the magnificent `libsoxr` engine.
+
+<a name="chinese"></a>
+## 中文
+
+为 Linux DeaDBeeF 播放器打造的高精度重采样 DSP 插件。其核心算法与数学模型完全由 **libsoxr** 提供，确保其音质与滤波特性与 Windows 平台著名的 **Foobar2000 SoX Resampler** 完全同源。
+
+### 核心逻辑
+
+  * **算法同源**：完全采用 `libsoxr` 引擎，在数学层面实现与 Foobar2000 原版插件的像素级对齐。
+  * **纯手工参数注入**：屏蔽不透明的预设宏，手工注入物理参数（通带、相位响应、精度），确保滤波特性符合预期。
+  * **双基准频率路由**：针对 44.1kHz 与 48kHz 族系提供独立的目标频率设置（支持 1x/2x/4x），有效避免非整数倍 SRC 劣化。
+  * **基于 FIFO 的平滑吞吐**：引入坚固的 FIFO 环形缓冲机制，完美承载异步数据块，保障播放极其平滑并杜绝“快放”异常。
+
+### 编译与安装
+
+**环境依赖**: `libsoxr-dev`, `deadbeef-plugins-dev`, `cmake`.
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+make install
 ```
+
+*默认安装路径：`~/.local/lib/deadbeef/`*
+
+### 宿主配置必读（修复进度条速度）
+
+受 DeaDBeeF 双层重采样架构限制，为修正进度条“1/4速度”Bug，请务必进行以下设置以实现“负负得正”：
+
+1.  进入 `首选项 -> 播放 (Playback)`。
+2.  **开启** `重采样 (Resampling)`。
+3.  **开启** `分别设置 44.1kHz 和 48kHz (Resample separate)`。
+4.  **频率对齐**：确保宿主设置的两个目标采样率与你在 SoX 插件中选择的目标频率**完全一致**。
+
+### 致谢
+
+  * **lvqcl**: Foobar2000 SoX 插件作者，提供了核心数学模型参考。
+  * **Rob Sykes**: `libsoxr` 引擎作者。
+
