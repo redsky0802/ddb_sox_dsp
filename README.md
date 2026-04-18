@@ -47,7 +47,14 @@ make install
 
 安装完成后，完全重启 DeaDBeeF。在 `Preferences -> DSP` 菜单中添加并配置 **SoX Resampler (FB2K Core)** 即可生效。
 
-### 4. 参考项目与致谢
+### 4. 宿主配置必读（避免进度条异常）
+
+由于 DeaDBeeF 存在双层重采样机制（宿主自带 SRC + DSP 插件）的时钟比例干扰，为了获得正常的进度条速度与完美的音质，请务必进行以下设置：
+1. 进入 DeaDBeeF `首选项 (Preferences) -> 播放 (Playback)`。
+2. **开启** `重采样 (Resampling)` 选项。
+3. **确保宿主设定的“目标采样率”（Target Sample Rate）与你在 SoX 插件中选择的目标频率完全一致**。
+
+### 5. 参考项目与致谢
 
 本插件的诞生站在了巨人的肩膀上。核心逻辑与工程架构深度参考了以下开源项目，在此致敬：
 

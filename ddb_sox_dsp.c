@@ -136,9 +136,10 @@ static int ddb_soxr_process(ddb_dsp_context_t *ctx, float *samples, int frames, 
 
     if (!soxr->soxr) return frames;
 
-    /* 3. 修改时钟标签 (物理防快放：严格在确认引擎存活后再握手) */
+    /* 3. 修改时钟标签 (屏蔽 ratio 修改，避免与 DeaDBeeF 宿主自带 SRC 的错误 ratio 叠加) */
     if (fmt->samplerate != target_rate) {
-        if (ratio) *ratio *= (float)in_rate / target_rate;
+        /* 负负得正：宿主即使在直通时也会给出错误 ratio，注释掉此行真实 ratio 以直接抵消宿主 Bug */
+        // if (ratio) *ratio *= (float)target_rate / in_rate;
         fmt->samplerate = target_rate;
     }
 
