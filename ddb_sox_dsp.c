@@ -22,8 +22,8 @@ typedef struct {
     soxr_t soxr;
     
     /* 参数数组 (严格对齐 UI 的 6 个控件)
-     * [0] 44.1k 基准目标频率
-     * [1] 48k 基准目标频率
+     * [0] 48k 基准目标频率
+     * [1] 44.1k 基准目标频率
      * [2] 阻带衰减质量 (Quality)
      * [3] 通带截止点 (Passband -3dB)
      * [4] 相位响应 (Phase Response)
@@ -52,8 +52,8 @@ static ddb_dsp_context_t *ddb_soxr_open(void) {
     ddb_soxr_t *soxr = calloc(1, sizeof(ddb_soxr_t));
     if (soxr) {
         soxr->ctx.plugin = &plugin;
-        soxr->params[0] = 2;   // 44.1k 族系默认: 176400 (4x)
-        soxr->params[1] = 2;   // 48k   族系默认: 192000 (4x)
+        soxr->params[0] = 2;   // 48k   族系默认: 192000 (4x)
+        soxr->params[1] = 2;   // 44.1k 族系默认: 176400 (4x)
         soxr->params[2] = 3;   // Quality: Ultra_168dB
         soxr->params[3] = 950; // Passband (-3dB): 95.0%
         soxr->params[4] = 500; // Phase Response: 50.0% (线性相位)
@@ -85,11 +85,11 @@ static int ddb_soxr_process(ddb_dsp_context_t *ctx, float *samples, int frames, 
     /* 1. 自动路由目标采样率 (双基准路由逻辑) */
     if (in_rate % 44100 == 0) {
         static const int r44[] = {44100, 88200, 176400};
-        int idx = soxr->params[0];
+        int idx = soxr->params[1];
         target_rate = r44[idx >= 0 && idx <= 2 ? idx : 0];
     } else {
         static const int r48[] = {48000, 96000, 192000};
-        int idx = soxr->params[1];
+        int idx = soxr->params[0];
         target_rate = r48[idx >= 0 && idx <= 2 ? idx : 0];
     }
 
@@ -99,7 +99,7 @@ static int ddb_soxr_process(ddb_dsp_context_t *ctx, float *samples, int frames, 
         
         soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
         
-        /* 内存清零手工填充，严禁使用 VHQ 宏避免参数冲突 */
+        /* 内存清零手工填充，严禁使用 VHQ 等宏避免参数冲突 */
         soxr_quality_spec_t q_spec;
         memset(&q_spec, 0, sizeof(q_spec));
         
@@ -136,7 +136,7 @@ static int ddb_soxr_process(ddb_dsp_context_t *ctx, float *samples, int frames, 
 
     if (!soxr->soxr) return frames;
 
-    /* 3. 修改时钟标签 (物理防快放) */
+    /* 3. 修改时钟标签 (DeaDBeeF 宿主固有缺陷）*/
     if (fmt->samplerate != target_rate) {
         /* * 进度条修正策略：负负得正
          * DeaDBeeF 宿主在开启重采样时，即使处于直通状态也会强行计算一个 ratio。
@@ -209,8 +209,8 @@ static void ddb_reset(ddb_dsp_context_t *ctx) {
 
 /* 包含显示名称的 Dialog 描述字符串 (代替不稳定的 get_param_name 回调) */
 static const char settings_dlg[] =
-    "property \"Target Rate (44.1k base)\" select[3] 0 2 44100 88200 176400;\n"
     "property \"Target Rate (48k base)\" select[3] 1 2 48000 96000 192000;\n"
+    "property \"Target Rate (44.1k base)\" select[3] 0 2 44100 88200 176400;\n"
     "property \"Quality\" select[6] 2 3 Best_53_319dB Ultra_47_282dB Ultra_37_222dB Ultra_168dB High_120dB Fast_96dB;\n"
     "property \"Passband (-3dB) 70.0-99.9%\" spinbtn[70.0,99.9,0.1] 3 95.0;\n"
     "property \"Phase Response 0.0-50.0%\" spinbtn[0.0,50.0,0.1] 4 50.0;\n"
@@ -223,7 +223,7 @@ static DB_dsp_t plugin = {
     .plugin.api_vmajor = 1, 
     .plugin.api_vminor = 0,
     .plugin.version_major = 1, 
-    .plugin.version_minor = 32,
+    .plugin.version_minor = 0,
     .plugin.type = DB_PLUGIN_DSP, 
     .plugin.id = "soxr_fb2k_core", 
     .plugin.name = "SoX Resampler (FB2K Core)",

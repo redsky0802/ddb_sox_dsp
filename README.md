@@ -25,19 +25,24 @@ make install
 
 *Default install path: `~/.local/lib/deadbeef/`.*
 
-### Critical Configuration (Progress Bar Fix)
+### DeaDBeeF Configuration
 
-Due to the double-resampling architecture of DeaDBeeF, please follow these steps to ensure the progress bar moves at the correct speed:
+Due to the double-resampling architecture of DeaDBeeF, please follow these steps:
 
 1.  Go to `Preferences -> Playback`.
-2.  **Enable** `Resampling`.
-3.  **Enable** `Resample separate` (to distinguish 44.1k/48k bases).
+2.  **Enable** `Override samplerate`.
+3.  **Enable** `Based on input separate`, to distinguish 48k/44.1k bases.
 4.  **Match the Rates**: Ensure the Host's "Target rate" for both groups **exactly matches** the target frequencies selected in the SoX plugin.
 
 ### Credits
 
   * **lvqcl**: For the original Foobar2000 plugin logic and `TO_3dB` model.
   * **Rob Sykes**: For the magnificent `libsoxr` engine.
+  * **silentlexx**: For the plugin `deadbeef_soxr` in early days.
+
+### AI Assistance
+
+The initial three commits were all extracted from the AI LLM dialogue (Gemini 3.1 Pro), and the debugging process was extremely tedious. I'll have to find a smarter helper next time.jpg
 
 <a name="chinese"></a>
 ## 中文
@@ -64,17 +69,21 @@ make install
 
 *默认安装路径：`~/.local/lib/deadbeef/`*
 
-### 宿主配置必读（修复进度条速度）
+### DeaDBeeF 配置
 
-受 DeaDBeeF 双层重采样架构限制，为修正进度条“1/4速度”Bug，请务必进行以下设置以实现“负负得正”：
+受 DeaDBeeF 双层重采样架构限制，请务必进行以下设置：
 
-1.  进入 `首选项 -> 播放 (Playback)`。
-2.  **开启** `重采样 (Resampling)`。
-3.  **开启** `分别设置 44.1kHz 和 48kHz (Resample separate)`。
+1.  进入 `首选项 -> 播放`。
+2.  **开启** `覆盖采样率`。
+3.  **开启** `根据输入采样率`，分别设置 48kHz 和 44.1kHz 的整数倍的目标频率。
 4.  **频率对齐**：确保宿主设置的两个目标采样率与你在 SoX 插件中选择的目标频率**完全一致**。
 
 ### 致谢
 
   * **lvqcl**: Foobar2000 SoX 插件作者，提供了核心数学模型参考。
   * **Rob Sykes**: `libsoxr` 引擎作者。
+  * **silentlexx**: `deadbeef_soxr` 老插件作者。
 
+### AI 协助
+
+最初的 3 个 commit 全部摘录自 AI 大语言模型对话（Gemini 3.1 Pro)，调试过程极为折磨。下一次得找个更聪明点的帮手.jpg
