@@ -1,0 +1,39 @@
+# --- 编译产物 ---
+*.o
+*.so
+*.a
+*.la
+*.lo
+*.slo
+
+# --- 构建目录 ---
+# 建议所有编译操作都在 build/ 文件夹内进行
+build/
+
+# --- CMake 产生的临时文件 ---
+# 如果用户不小心在根目录执行了 cmake .
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+Makefile
+_CPack_Packages/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
+# --- 编辑器与系统临时文件 ---
+*~
+*.swp
+*.swo
+.DS_Store
+
+# --- IDE 配置文件 ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- 调试与日志 ---
+core
+*.log
