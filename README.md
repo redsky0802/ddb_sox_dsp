@@ -14,7 +14,7 @@ High-precision resampling DSP plugin for DeaDBeeF player on Linux. The core algo
 * **FIFO Smoothing**: A robust ring buffer handles asynchronous data chunks, ensuring jitter-free playback and preventing "chipmunk" speed anomalies.
 
 ### Compilation & Installation
-**Dependencies**: `libsoxr-dev`, `deadbeef-plugins-dev`, `cmake`.
+**Dependencies**: `deadbeef >= 1.10.1`, `libsoxr-dev`, `deadbeef-plugins-dev`, `cmake`.
 
 ```bash
 mkdir build && cd build
@@ -58,7 +58,7 @@ The initial three commits were all extracted from the AI LLM dialogue (Gemini 3.
 
 ### 编译与安装
 
-**环境依赖**: `libsoxr-dev`, `deadbeef-plugins-dev`, `cmake`.
+**环境依赖**:  `deadbeef >= 1.10.1`，`libsoxr-dev`，`deadbeef-plugins-dev`，`cmake`。
 
 ```bash
 mkdir build && cd build
